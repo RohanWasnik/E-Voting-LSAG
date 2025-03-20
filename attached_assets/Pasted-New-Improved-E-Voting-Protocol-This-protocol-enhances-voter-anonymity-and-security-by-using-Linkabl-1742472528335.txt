@@ -1,0 +1,97 @@
+New Improved E-Voting Protocol
+This protocol enhances voter anonymity and security by using Linkable Spontaneous Anonymous Group (LSAG) Signatures. It eliminates collusion risks between the Registration Authority (RA) and Election Authority (EA).
+
+1. Registration Phase
+Goal: Ensure voter eligibility verification while maintaining anonymity.
+
+Steps:
+
+The Government (GOV) issues a voter certificate that includes:
+
+σ_v (signed verification token)
+Pu_gov (government’s public key)
+Pu_voter (voter’s public key)
+The voter publishes the certificate on the blockchain using:
+
+scss
+Copy
+Edit
+BB.storePub(CERT_v)
+The Election Authority (EA) stores election parameters such as:
+
+scss
+Copy
+Edit
+BB.storePollParams(L, C, r)
+L = Election ID
+C = List of candidates
+r = Random challenge
+The voter generates a new key pair (Pu', Pr') and signs the eligibility proof using LSAG:
+
+mathematica
+Copy
+Edit
+σ_v = LSAG.Sign(r, Pu, Pr)
+The proof is stored on the blockchain via:
+
+scss
+Copy
+Edit
+BB.verify(σ_v, Pu')
+Key Features:
+
+Decentralized voter eligibility check (no reliance on RA/EA).
+LSAG ensures voter anonymity while verifying eligibility.
+2. Vote Casting Phase
+Goal: Ensure anonymous and verifiable vote submission.
+
+Steps:
+
+The voter signs their vote using LSAG:
+
+bash
+Copy
+Edit
+σ_v' = PKS.sign(C_j, Pr')
+C_j = Candidate choice
+Pr' = Voter’s private key
+Compute a cryptographic hash of the vote:
+
+ini
+Copy
+Edit
+h_v = H(σ_v', L)
+H = Hash function (e.g., SHA-256)
+L = Election ID
+Sign the hash to prove integrity:
+
+pgsql
+Copy
+Edit
+σ_v'' = PKS.sign(h_v, Pr')
+Store the vote on the blockchain:
+
+python
+Copy
+Edit
+BB.round(σ_v'', h_v, k_v)
+k_v = Vote index in the blockchain
+Key Features:
+
+Votes are anonymous (no voter identity stored).
+Prevents duplicate voting using LSAG linkability.
+3. Vote Tallying Phase
+Goal: Aggregate votes securely and fairly.
+
+Steps:
+
+The Election Authority verifies each vote:
+
+Ensures valid LSAG signature.
+Checks that vote hashes match.
+If valid, increment the candidate’s vote count.
+
+Key Features:
+
+Ensures correctness and fairness (only valid votes are counted).
+Prevents duplicate voting using LSAG’s linkability.
